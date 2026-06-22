@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteo: Cajas Misteriosas Pro 🎁</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --accent: #f59e0b;
+            --accent-hover: #d97706;
+            --box-color: #3b82f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Sección de Guía de Uso (Nueva) */
+        .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .info-section { grid-template-columns: 1fr; }
+        }
+
+        .info-card {
+            background: rgba(30, 41, 59, 0.6);
+            border-left: 4px solid var(--accent);
+            padding: 15px 20px;
+            border-radius: 0 12px 12px 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .info-card h4 {
+            margin: 0 0 8px 0;
+            color: var(--accent);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .info-card li {
+            margin-bottom: 5px;
+        }
+
+        .admin-gear {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #64748b;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 5px;
+            margin: 0;
+        }
+        .admin-gear:hover {
+            color: var(--accent);
+            transform: scale(1.1);
+        }
+
+        .config-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            background: #0f172a;
+            color: #fff;
+            border: 2px solid #475569;
+            border-radius: 6px;
+            resize: none;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+            transform: scale(1.03);
+        }
+
+        .control-panel {
+            margin-bottom: 25px;
+            display: none;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .auto-btn { background-color: #10b981; color: white; }
+        .auto-btn:hover { background-color: #059669; }
+
+        .stop-btn { background-color: #ef4444; color: white; }
+        .stop-btn:hover { background-color: #dc2626; }
+
+        .shuffle-btn { background-color: #8b5cf6; color: white; }
+        .shuffle-btn:hover { background-color: #6d28d9; }
+
+        .reveal-all-btn { background-color: #64748b; color: white; }
+        .reveal-all-btn:hover { background-color: #475569; }
+
+        /* Cuadrícula de Cajas */
+        .grid-boxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            perspective: 1000px;
+        }
+
+        .box {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            aspect-ratio: 1 / 1;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s, background 0.5s;
+            user-select: none;
+            border: 3px solid #60a5fa;
+            transform-style: preserve-3d;
+            position: relative;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .box:hover:not(.opened):not(.roulette-active) {
+            transform: translateY(-5px) scale(1.05);
+            border-color: #93c5fd;
+        }
+
+        .box.roulette-active {
+            background: linear-gradient(135deg, #ec4899, #f43f5e) !important;
+            border-color: #fff !important;
+            box-shadow: 0 0 25px #f43f5e !important;
+            transform: scale(1.1);
+        }
+
+        .box.shuffle-shake {
+            animation: intenseShuffle 0.5s ease-in-out;
+        }
+
+        @keyframes intenseShuffle {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            20% { transform: translate(-10px, 8px) rotate(-8deg) scale(0.95); }
+            40% { transform: translate(12px, -10px) rotate(10deg); }
+            60% { transform: translate(-8px, -6px) rotate(-6deg); }
+            80% { transform: translate(6px, 6px) rotate(5deg) scale(1.05); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+        }
+
+        .box.opening-3d {
+            transform: rotateY(360deg) scale(0.8);
+            background: linear-gradient(135deg, #eab308, #ca8a04);
+            border-color: #fef08a;
+        }
+
+        .box.opened {
+            background: #1e293b !important;
+            border: 2px dashed #475569 !important;
+            color: #34d399;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.5) !important;
+            font-size: 0.9rem;
+            font-weight: 600;
+            word-break: break-word;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Ventana Emergente */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border: 3px solid var(--accent);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .prize-text {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #34d399;
+            margin: 25px 0;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+<button class="admin-gear" id="gearBtn" onclick="toggleEditMode()" title="Editar opciones" style="display:none;">⚙️</button>
+
+<div class="container">
+    <h1>🎁 Cajas Misteriosas Pro 🎁</h1>
+    
+    <!-- Configuración inicial e instrucciones -->
+    <div class="config-section" id="configSection">
+        
+        <!-- Bloque de Información de la Página -->
+        <div class="info-section" id="infoPanel">
+            <div class="info-card">
+                <h4>💡 ¿Para qué sirve esta página?</h4>
+                Esta herramienta interactiva transforma sorteos comunes en una experiencia emocionante de **Cajas Misteriosas**. Es ideal para eventos en vivo, dinámicas de trabajo, pausas activas, sorteos de premios corporativos o trivias académicas donde los participantes deban responder preguntas o ganar recompensas al azar.
+            </div>
+            <div class="info-card">
+                <h4>🛠️ ¿Cómo se usa? (Paso a Paso)</h4>
+                <ul>
+                    <li>Escribe tu lista de premios, retos o preguntas en el cuadro de abajo (un elemento por línea).</li>
+                    <li>Presiona **"Generar Tablero"** para crear las cajas numeradas en pantalla (el sistema las mezclará en secreto).</li>
+                    <li>En su turno, cada participante elige una caja haciendo clic directo en ella, o usa la **"Ruleta Automática"** si prefiere que la computadora decida.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3 id="configTitle">Configuración del Sorteo</h3>
+        <p id="configInstructions">Introduce las opciones (uno por línea, entre 2 y 50):</p>
+        <textarea id="inputPrizes" placeholder="Premio: Laptop&#10;Pregunta: ¿Capital de Francia?&#10;Premio: Tarjeta de Regalo&#10;Siga participando"></textarea>
+        <br>
+        <button id="btnSubmitConfig" onclick="buildBoxes()">Generar Tablero</button>
+        <button id="btnCancelEdit" onclick="cancelEdit()" style="display:none; background-color:#64748b; color:white;">Cancelar</button>
+    </div>
+
+    <!-- Panel de controles activos -->
+    <div class="control-panel" id="controlPanel">
+        <button class="auto-btn" id="btnAuto" onclick="startRoulette()">🤖 Ruleta Automática</button>
+        <button class="shuffle-btn" id="btnShuffle" onclick="shuffleRemainingPrizes()">🔀 Mezclar Restantes</button>
+        <button class="reveal-all-btn" id="btnRevealAll" onclick="revealAllBoxes()">👁️ Revelar Todo</button>
+        <button class="stop-btn" id="btnStop" onclick="resetToMainMenu()">🛑 Detener Sorteo</button>
+    </div>
+
+    <!-- Tablero de juego -->
+    <div class="grid-boxes" id="boxGrid"></div>
+</div>
+
+<!-- Modal Revelador -->
+<div class="modal" id="prizeModal">
+    <div class="modal-content">
+        <h2 id="modalTitle">Caja Abierta</h2>
+        <div class="prize-text" id="modalPrize">Contenido...</div>
+        <button onclick="closeModal()">Continuar Sorteo</button>
+    </div>
+</div>
+
+<script>
+    let currentPrizes = [];
+    let boxStates = []; 
+    let isAnimating = false;
+
+    function buildBoxes() {
+        const text = document.getElementById('inputPrizes').value;
+        const items = text.split('\n').map(item => item.trim()).filter(item => item !== '');
+
+        if (items.length < 2 || items.length > 50) {
+            alert('Por favor, ingresa entre 2 and 50 opciones.');
+            return;
+        }
+
+        if (currentPrizes.length > 0) {
+            let updatedPrizes = new Array(items.length);
+            let updatedStates = new Array(items.length).fill(false);
+
+            boxStates.forEach((isOpen, index) => {
+                if (isOpen && index < items.length) {
+                    updatedPrizes[index] = currentPrizes[index];
+                    updatedStates[index] = true;
+                }
+            });
+
+            let availableNewItems = items.filter(item => !updatedPrizes.includes(item));
+
+            for (let i = 0; i < items.length; i++) {
+                if (!updatedStates[i]) {
+                    if (availableNewItems.length > 0) {
+                        updatedPrizes[i] = availableNewItems.shift();
+                    } else {
+                        updatedPrizes[i] = items[i] || "Premio sorpresa";
+                    }
+                }
+            }
+
+            currentPrizes = updatedPrizes;
+            boxStates = updatedStates;
+        } else {
+            currentPrizes = items.sort(() => Math.random() - 0.5);
+            boxStates = new Array(currentPrizes.length).fill(false);
+        }
+
+        renderGrid();
+
+        document.getElementById('configSection').style.display = 'none';
+        document.getElementById('controlPanel').style.display = 'flex';
+        document.getElementById('gearBtn').style.display = 'block';
+    }
+
+    function renderGrid() {
+        const grid = document.getElementById('boxGrid');
+        grid.innerHTML = ''; 
+
+        currentPrizes.forEach((prize, index) => {
+            const boxDiv = document.createElement('div');
+            boxDiv.className = 'box';
+            boxDiv.id = `box-${index}`;
+            
+            if (boxStates[index]) {
+                boxDiv.classList.add('opened');
+                boxDiv.innerText = prize; 
+            } else {
+                boxDiv.innerText = index + 1;
+                boxDiv.onclick = () => userPickBox(index);
+            }
+            grid.appendChild(boxDiv);
+        });
+    }
+
+    function userPickBox(index) {
+        if (boxStates[index] || isAnimating) return;
+        openBoxWithAnimation(index);
+    }
+
+    function openBoxWithAnimation(index) {
+        isAnimating = true;
+        const boxElem = document.getElementById(`box-${index}`);
+        boxElem.classList.add('opening-3d');
+        boxElem.innerText = '❓';
+
+        setTimeout(() => {
+            boxStates[index] = true;
+            boxElem.classList.remove('opening-3d');
+            boxElem.classList.add('opened');
+            boxElem.innerText = currentPrizes[index]; 
+
+            document.getElementById('modalTitle').innerText = `Contenido de la Caja N° ${index + 1}`;
+            document.getElementById('modalPrize').innerText = currentPrizes[index];
+            document.getElementById('prizeModal').style.display = 'flex';
+            isAnimating = false;
+        }, 600);
+    }
+
+    function startRoulette() {
+        if (isAnimating) return;
+
+        let closedIndexes = [];
+        boxStates.forEach((isOpen, index) => {
+            if (!isOpen) closedIndexes.push(index);
+        });
+
+        if (closedIndexes.length === 0) {
+            alert('¡Todas las cajas han sido abiertas!');
+            return;
+        }
+
+        isAnimating = true;
+        togglePanelButtons(true);
+
+        let velocity = 60;  
+        let cycles = 0;     
+        let currentIndexInClosed = 0;
+        let lastHighlightedBox = null;
+
+        const totalSteps = 15 + Math.floor(Math.random() * 15); 
+        
+        function rouletteTick() {
+            if (lastHighlightedBox) {
+                lastHighlightedBox.classList.remove('roulette-active');
+            }
+
+            currentIndexInClosed = (currentIndexInClosed + 1) % closedIndexes.length;
+            const targetIndex = closedIndexes[currentIndexInClosed];
+            
+            const currentBox = document.getElementById(`box-${targetIndex}`);
+            currentBox.classList.add('roulette-active');
+            lastHighlightedBox = currentBox;
+
+            cycles++;
+
+            if (cycles < totalSteps) {
+                if (totalSteps - cycles < 5) {
+                    velocity += 80; 
+                }
+                setTimeout(rouletteTick, velocity);
+            } else {
+                setTimeout(() => {
+                    currentBox.classList.remove('roulette-active');
+                    togglePanelButtons(false);
+                    openBoxWithAnimation(targetIndex);
+                }, 300);
+            }
+        }
+        rouletteTick();
+    }
+
+    function togglePanelButtons(disabled) {
+        const buttons = document.querySelectorAll('.control-panel button');
+        buttons.forEach(btn => btn.disabled = disabled);
+    }
+
+    function resetToMainMenu() {
+        if (isAnimating) return;
+        if (!confirm('¿Seguro que deseas detener el sorteo actual? Se perderá todo el progreso.')) return;
+        forceFullReset();
+    }
+
+    function forceFullReset() {
+        currentPrizes = [];
+        boxStates = [];
+        document.getElementById('boxGrid').innerHTML = '';
+        document.getElementById('controlPanel').style.display = 'none';
+        document.getElementById('gearBtn').style.display = 'none';
+        
+        document.getElementById('configSection').style.display = 'block';
+        document.getElementById('infoPanel').style.display = 'grid'; // Mostrar guía al reiniciar
+        document.getElementById('configTitle').innerText = 'Configuración del Sorteo';
+        document.getElementById('configInstructions').innerText = 'Introduce las opciones (uno por línea, entre 2 y 50):';
+        document.getElementById('btnSubmitConfig').innerText = 'Generar Tablero';
+        document.getElementById('btnCancelEdit').style.display = 'none';
+        document.getElementById('inputPrizes').value = ''; 
+    }
+
+    function revealAllBoxes() {
+        if (isAnimating) return;
+        if (!confirm('¿Seguro que deseas revelar todas las cajas restantes?')) return;
+
+        boxStates.forEach((isOpen, index) => {
+            if (!isOpen) {
+                boxStates[index] = true;
+                const boxElem = document.getElementById(`box-${index}`);
+                boxElem.classList.add('opened');
+                boxElem.innerText = currentPrizes[index]; 
+            }
+        });
+    }
+
+    function shuffleRemainingPrizes() {
+        if (isAnimating) return;
+        let remainingPrizes = [];
+        let closedIndexes = [];
+
+        boxStates.forEach((isOpen, index) => {
+            if (!isOpen) {
+                remainingPrizes.push(currentPrizes[index]);
+                closedIndexes.push(index);
+            }
+        });
+
+        if (closedIndexes.length <= 1) {
+            alert('No hay suficientes cajas cerradas para mezclar.');
+            return;
+        }
+
+        isAnimating = true;
+        remainingPrizes.sort(() => Math.random() - 0.5);
+
+        closedIndexes.forEach((originalIndex, i) => {
+            currentPrizes[originalIndex] = remainingPrizes[i];
+            const boxElem = document.getElementById(`box-${originalIndex}`);
+            boxElem.classList.add('shuffle-shake');
+            setTimeout(() => {
+                boxElem.classList.remove('shuffle-shake');
+                if (i === closedIndexes.length - 1) isAnimating = false; 
+            }, 500);
+        });
+    }
+
+    function toggleEditMode() {
+        if (isAnimating) return;
+        
+        const config = document.getElementById('configSection');
+        if (config.style.display === 'none') {
+            config.style.display = 'block';
+            document.getElementById('infoPanel').style.display = 'none'; // Ocultar guía al editar
+            document.getElementById('configTitle').innerText = 'Modo Edición Activo ⚙️';
+            document.getElementById('configInstructions').innerText = 'Modifica o añade opciones. Las cajas ya abiertas mantendrán su texto.';
+            document.getElementById('btnSubmitConfig').innerText = 'Aplicar Cambios y Continuar';
+            document.getElementById('btnCancelEdit').style.display = 'inline-block';
+            document.getElementById('inputPrizes').value = currentPrizes.join('\n');
+        } else {
+            cancelEdit();
+        }
+    }
+
+    function cancelEdit() {
+        document.getElementById('configSection').style.display = 'none';
+        document.getElementById('btnCancelEdit').style.display = 'none';
+    }
+
+    function closeModal() {
+        document.getElementById('prizeModal').style.display = 'none';
+        if (!boxStates.includes(false)) {
+            alert('🏆 ¡Todas las cajas han sido descubiertas!');
+        }
+    }
+</script>
+
+</body>
+</html>
