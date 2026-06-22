@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta name="description" content="Aplicación interactiva de Cajas Misteriosas para sorteos, trivias y juegos en vivo.">
-    <meta name="keywords" content="sorteo, cajas misteriosas, ruleta aleatoria, juego interactivo, sorteo online gratis">
-    <meta name="author" content="Tu Nombre">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sorteo: Cajas Misteriosas Pro 🎁</title>
@@ -43,7 +40,7 @@
             text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
         }
 
-        /* Sección de Guía de Uso (Nueva) */
+        /* Sección de Guía de Uso */
         .info-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -109,17 +106,21 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        textarea {
+        input[type="text"], textarea {
             width: 100%;
-            height: 120px;
             padding: 10px;
             background: #0f172a;
             color: #fff;
             border: 2px solid #475569;
             border-radius: 6px;
-            resize: none;
             box-sizing: border-box;
             font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
         }
 
         button {
@@ -238,7 +239,7 @@
             line-height: 1.2;
         }
 
-        /* Ventana Emergente */
+        /* Ventana Emergente Mejorada */
         .modal {
             display: none;
             position: fixed;
@@ -266,12 +267,30 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
+        .modal h2 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         .prize-text {
-            font-size: 2.5rem;
+            font-size: 2.6rem;
             font-weight: 800;
             color: #34d399;
-            margin: 25px 0;
+            margin: 20px 0;
             word-wrap: break-word;
+            text-shadow: 0 0 15px rgba(52, 211, 153, 0.2);
+        }
+
+        .modal-footer-box {
+            font-size: 0.95rem;
+            color: #64748b;
+            border-top: 1px solid #334155;
+            padding-top: 15px;
+            margin-bottom: 20px;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -280,39 +299,37 @@
 <button class="admin-gear" id="gearBtn" onclick="toggleEditMode()" title="Editar opciones" style="display:none;">⚙️</button>
 
 <div class="container">
-    <h1>🎁 Cajas Misteriosas Pro 🎁</h1>
+    <h1 id="mainTitle">🎁 Cajas Misteriosas Pro 🎁</h1>
     
-    <!-- Configuración inicial e instrucciones -->
     <div class="config-section" id="configSection">
         
-        <!-- Bloque de Información de la Página -->
         <div class="info-section" id="infoPanel">
             <div class="info-card">
                 <h4>💡 ¿Para qué sirve esta página?</h4>
-                Esta herramienta interactiva transforma sorteos comunes en una experiencia emocionante de Cajas Misteriosas. Es ideal para eventos en vivo, dinámicas de trabajo, pausas activas, sorteos de premios corporativos o trivias académicas donde los participantes deban responder preguntas o ganar recompensas al azar.
+                Esta herramienta interactiva transforma sorteos comunes en una experiencia emocionante de **Cajas Misteriosas**. Es ideal para eventos en vivo, dinámicas de trabajo, pausas activas, sorteos de premios corporativos o trivias académicas donde los participantes deban responder preguntas o ganar recompensas al azar.
             </div>
             <div class="info-card">
                 <h4>🛠️ ¿Cómo se usa? (Paso a Paso)</h4>
                 <ul>
-                    <li>Escribe tu lista de premios, retos o preguntas en el cuadro de abajo (un elemento por línea).</li>
-                    <li>Presiona "Generar Tablero" para crear las cajas numeradas en pantalla (el sistema las mezclará en secreto).</li>
-                    <li>En su turno, cada participante elige una caja haciendo clic directo en ella, o usa la "Ruleta Automática" si prefiere que la computadora decida.</li>
+                    <li>Escribe un título personalizado para identificar tu evento o dinámica.</li>
+                    <li>Escribe tu lista de premios, retos o preguntas abajo (un elemento por línea).</li>
+                    <li>Presiona **"Generar Tablero"** para crear las cajas numeradas en pantalla (el sistema las mezclará en secreto).</li>
                 </ul>
             </div>
         </div>
 
         <h3 id="configTitle">Configuración del Sorteo</h3>
-        <!-- AGREGAR ESTO: Campo para el título del sorteo -->
+        
         <p>Introduce el título personalizado para este sorteo:</p>
-        <input type="text" id="inputTitle" placeholder="Ej: Gran Sorteo de la Empresa" style="width: 100%; padding: 10px; background: #0f172a; color: #fff; border: 2px solid #475569; border-radius: 6px; box-sizing: border-box; font-size: 1rem; margin-bottom: 15px;">
-        <p id="configInstructions">Introduce las opciones (uno por línea, entre 2 y 50):</p>
+        <input type="text" id="inputTitle" placeholder="Ej: Gran Sorteo de la Empresa">
+
+        <p id="configInstructions">Introduce las opciones o premios (uno por línea, entre 2 y 50):</p>
         <textarea id="inputPrizes" placeholder="Premio: Laptop&#10;Pregunta: ¿Capital de Francia?&#10;Premio: Tarjeta de Regalo&#10;Siga participando"></textarea>
         <br>
         <button id="btnSubmitConfig" onclick="buildBoxes()">Generar Tablero</button>
         <button id="btnCancelEdit" onclick="cancelEdit()" style="display:none; background-color:#64748b; color:white;">Cancelar</button>
     </div>
 
-    <!-- Panel de controles activos -->
     <div class="control-panel" id="controlPanel">
         <button class="auto-btn" id="btnAuto" onclick="startRoulette()">🤖 Ruleta Automática</button>
         <button class="shuffle-btn" id="btnShuffle" onclick="shuffleRemainingPrizes()">🔀 Mezclar Restantes</button>
@@ -320,15 +337,17 @@
         <button class="stop-btn" id="btnStop" onclick="resetToMainMenu()">🛑 Detener Sorteo</button>
     </div>
 
-    <!-- Tablero de juego -->
     <div class="grid-boxes" id="boxGrid"></div>
 </div>
 
-<!-- Modal Revelador -->
 <div class="modal" id="prizeModal">
     <div class="modal-content">
-        <h2 id="modalTitle">Caja Abierta</h2>
+        <h2 id="modalTitle">Título del Sorteo</h2>
+        
         <div class="prize-text" id="modalPrize">Contenido...</div>
+        
+        <div class="modal-footer-box" id="modalBoxNumber">Caja Seleccionada</div>
+        
         <button onclick="closeModal()">Continuar Sorteo</button>
     </div>
 </div>
@@ -337,19 +356,25 @@
     let currentPrizes = [];
     let boxStates = []; 
     let isAnimating = false;
+    let globalTitle = "Cajas Misteriosas";
 
     function buildBoxes() {
-        // AGREGAR ESTO: Capturar el título personalizado
-        const customTitle = document.getElementById('inputTitle').value.trim();
-        if (customTitle !== "") {
-        document.querySelector('h1').innerText = `🎁 ${customTitle} 🎁`;
-        }
         const text = document.getElementById('inputPrizes').value;
         const items = text.split('\n').map(item => item.trim()).filter(item => item !== '');
+        const titleText = document.getElementById('inputTitle').value.trim();
 
         if (items.length < 2 || items.length > 50) {
-            alert('Por favor, ingresa entre 2 and 50 opciones.');
+            alert('Por favor, ingresa entre 2 y 50 opciones.');
             return;
+        }
+
+        // Configurar título global
+        if (titleText !== "") {
+            globalTitle = titleText;
+            document.getElementById('mainTitle').innerText = `🎁 ${globalTitle} 🎁`;
+        } else {
+            globalTitle = "Cajas Misteriosas";
+            document.getElementById('mainTitle').innerText = `🎁 ${globalTitle} 🎁`;
         }
 
         if (currentPrizes.length > 0) {
@@ -426,11 +451,11 @@
             boxElem.classList.add('opened');
             boxElem.innerText = currentPrizes[index]; 
 
-           // REEMPLAZAR CON ESTO: Muestra el título personalizado en el modal junto al número de caja
-            const customTitle = document.getElementById('inputTitle').value.trim();
-            const baseTitle = customTitle !== "" ? customTitle : "Caja Abierta";
-            document.getElementById('modalTitle').innerText = `${baseTitle} - Caja N° ${index + 1}`;
-            document.getElementById('modalPrize').innerText = currentPrizes[index];
+            // ESTRUCTURA DEL MODAL CORREGIDA:
+            document.getElementById('modalTitle').innerText = globalTitle; // Título Arriba
+            document.getElementById('modalPrize').innerText = currentPrizes[index]; // Contenido al Medio
+            document.getElementById('modalBoxNumber').innerText = `Caja N° ${index + 1}`; // Caja Abajo (Sutil)
+            
             document.getElementById('prizeModal').style.display = 'flex';
             isAnimating = false;
         }, 600);
@@ -503,17 +528,19 @@
     function forceFullReset() {
         currentPrizes = [];
         boxStates = [];
+        globalTitle = "Cajas Misteriosas";
         document.getElementById('boxGrid').innerHTML = '';
         document.getElementById('controlPanel').style.display = 'none';
         document.getElementById('gearBtn').style.display = 'none';
         
         document.getElementById('configSection').style.display = 'block';
-        document.getElementById('infoPanel').style.display = 'grid'; // Mostrar guía al reiniciar
+        document.getElementById('infoPanel').style.display = 'grid'; 
+        document.getElementById('mainTitle').innerText = '🎁 Cajas Misteriosas Pro 🎁';
         document.getElementById('configTitle').innerText = 'Configuración del Sorteo';
-        document.getElementById('configInstructions').innerText = 'Introduce las opciones (uno por línea, entre 2 y 50):';
         document.getElementById('btnSubmitConfig').innerText = 'Generar Tablero';
         document.getElementById('btnCancelEdit').style.display = 'none';
         document.getElementById('inputPrizes').value = ''; 
+        document.getElementById('inputTitle').value = ''; 
     }
 
     function revealAllBoxes() {
@@ -567,9 +594,8 @@
         const config = document.getElementById('configSection');
         if (config.style.display === 'none') {
             config.style.display = 'block';
-            document.getElementById('infoPanel').style.display = 'none'; // Ocultar guía al editar
+            document.getElementById('infoPanel').style.display = 'none'; 
             document.getElementById('configTitle').innerText = 'Modo Edición Activo ⚙️';
-            document.getElementById('configInstructions').innerText = 'Modifica o añade opciones. Las cajas ya abiertas mantendrán su texto.';
             document.getElementById('btnSubmitConfig').innerText = 'Aplicar Cambios y Continuar';
             document.getElementById('btnCancelEdit').style.display = 'inline-block';
             document.getElementById('inputPrizes').value = currentPrizes.join('\n');
