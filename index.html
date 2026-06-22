@@ -289,19 +289,22 @@
         <div class="info-section" id="infoPanel">
             <div class="info-card">
                 <h4>💡 ¿Para qué sirve esta página?</h4>
-                Esta herramienta interactiva transforma sorteos comunes en una experiencia emocionante de **Cajas Misteriosas**. Es ideal para eventos en vivo, dinámicas de trabajo, pausas activas, sorteos de premios corporativos o trivias académicas donde los participantes deban responder preguntas o ganar recompensas al azar.
+                Esta herramienta interactiva transforma sorteos comunes en una experiencia emocionante de Cajas Misteriosas. Es ideal para eventos en vivo, dinámicas de trabajo, pausas activas, sorteos de premios corporativos o trivias académicas donde los participantes deban responder preguntas o ganar recompensas al azar.
             </div>
             <div class="info-card">
                 <h4>🛠️ ¿Cómo se usa? (Paso a Paso)</h4>
                 <ul>
                     <li>Escribe tu lista de premios, retos o preguntas en el cuadro de abajo (un elemento por línea).</li>
-                    <li>Presiona **"Generar Tablero"** para crear las cajas numeradas en pantalla (el sistema las mezclará en secreto).</li>
-                    <li>En su turno, cada participante elige una caja haciendo clic directo en ella, o usa la **"Ruleta Automática"** si prefiere que la computadora decida.</li>
+                    <li>Presiona "Generar Tablero" para crear las cajas numeradas en pantalla (el sistema las mezclará en secreto).</li>
+                    <li>En su turno, cada participante elige una caja haciendo clic directo en ella, o usa la "Ruleta Automática" si prefiere que la computadora decida.</li>
                 </ul>
             </div>
         </div>
 
         <h3 id="configTitle">Configuración del Sorteo</h3>
+        <!-- AGREGAR ESTO: Campo para el título del sorteo -->
+        <p>Introduce el título personalizado para este sorteo:</p>
+        <input type="text" id="inputTitle" placeholder="Ej: Gran Sorteo de la Empresa" style="width: 100%; padding: 10px; background: #0f172a; color: #fff; border: 2px solid #475569; border-radius: 6px; box-sizing: border-box; font-size: 1rem; margin-bottom: 15px;">
         <p id="configInstructions">Introduce las opciones (uno por línea, entre 2 y 50):</p>
         <textarea id="inputPrizes" placeholder="Premio: Laptop&#10;Pregunta: ¿Capital de Francia?&#10;Premio: Tarjeta de Regalo&#10;Siga participando"></textarea>
         <br>
@@ -336,6 +339,11 @@
     let isAnimating = false;
 
     function buildBoxes() {
+        // AGREGAR ESTO: Capturar el título personalizado
+        const customTitle = document.getElementById('inputTitle').value.trim();
+        if (customTitle !== "") {
+        document.querySelector('h1').innerText = `🎁 ${customTitle} 🎁`;
+        }
         const text = document.getElementById('inputPrizes').value;
         const items = text.split('\n').map(item => item.trim()).filter(item => item !== '');
 
@@ -418,7 +426,10 @@
             boxElem.classList.add('opened');
             boxElem.innerText = currentPrizes[index]; 
 
-            document.getElementById('modalTitle').innerText = `Contenido de la Caja N° ${index + 1}`;
+           // REEMPLAZAR CON ESTO: Muestra el título personalizado en el modal junto al número de caja
+            const customTitle = document.getElementById('inputTitle').value.trim();
+            const baseTitle = customTitle !== "" ? customTitle : "Caja Abierta";
+            document.getElementById('modalTitle').innerText = `${baseTitle} - Caja N° ${index + 1}`;
             document.getElementById('modalPrize').innerText = currentPrizes[index];
             document.getElementById('prizeModal').style.display = 'flex';
             isAnimating = false;
